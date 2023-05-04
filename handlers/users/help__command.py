@@ -1,8 +1,8 @@
 from aiogram import types
-from loader import db
+from loader import dp
 
 
-@db.message_handler(text='/help')
+@dp.message_handler(text='/help')
 async def command_help(message: types.Message):
     await message.answer(F"Привет {message.from_user.full_name}!\n"
                          F"Список команд здесь!")

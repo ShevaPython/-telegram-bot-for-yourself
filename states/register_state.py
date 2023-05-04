@@ -6,3 +6,4 @@ class UserRegister(StatesGroup):
     name = State()
     age = State()
     photo = State()
+

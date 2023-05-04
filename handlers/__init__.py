@@ -1,3 +1,3 @@
-from .users import db
+from .users import dp
 
-__all__ = ['db']
+__all__ = ['dp']
