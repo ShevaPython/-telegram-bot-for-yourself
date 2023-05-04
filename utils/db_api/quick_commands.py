@@ -1,5 +1,5 @@
 from utils.db_api.db_gino import db
-from utils.db_api.schemas.user import User
+from utils.db_api.schemas.models import User
 from asyncpg import UniqueViolationError
 
 
