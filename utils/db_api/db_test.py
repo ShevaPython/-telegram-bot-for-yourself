@@ -1,32 +1,18 @@
 import asyncio
-
-from data import config
-from utils.db_api.db_gino import db
-from utils.db_api import quick_commands as commands
+from data_base import get_session
+from models import Base
 
 
-async def db_test():
-    await db.set_bind(config.POSTGRES_URI)
-    await db.gino.drop_all()
-    await db.gino.create_all()
+async def test_db():
+    async with get_session() as session:
+        async with session.begin():
+            await session.run_sync(Base.metadata.drop_all)
 
-    await commands.add_user(1)
-
-    users = await commands.select_all_users()
-    print(users)
-
-    count = await commands.count_all_users()
-    print(count)
-
-    user = await commands.select_user(1)
-    print(user)
-
+        async with session.begin():
+            await session.run_sync(Base.metadata.create_all)
 
 
 if __name__ == "__main__":
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        asyncio.run(db_test())
-    except KeyboardInterrupt:
-        pass
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test_db())
+

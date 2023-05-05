@@ -4,17 +4,11 @@ async def on_startup(dp):
     import middlewares
     middlewares.setup(dp)
 
-    from loader import db
-    from utils.db_api.db_gino import on_startup
+    from loader import dp
+    from utils.db_api.data_base import on_startup
     print('Подключения к Postgresql')
     await on_startup(dp)
 
-    print('Удаления базы данных')
-    await db.gino.drop_all()
-
-    print('Создания таблиц Postgresql')
-    await db.gino.create_all()
-    print('Готово')
 
     from utils.notify_admins import on_startup_notify
     await on_startup_notify(dp)
@@ -28,4 +22,4 @@ if __name__ == "__main__":
     from aiogram import executor
     from handlers import dp
 
-    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True)
