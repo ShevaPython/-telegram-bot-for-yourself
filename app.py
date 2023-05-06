@@ -1,25 +1,35 @@
+import filters
+import middlewares
+from utils.notify_admins import on_startup_notify
+from utils.set_botcommands import set_default_commands
+from utils.db_api import create_tables,test_connect_database,drop_tables
+
+
 async def on_startup(dp):
-    import filters
-    filters.setup(dp)
-    import middlewares
-    middlewares.setup(dp)
+    filters.setup( dp )
 
-    from loader import dp
-    from utils.db_api.data_base import on_startup
-    print('Подключения к Postgresql')
-    await on_startup(dp)
+    middlewares.setup( dp )
+
+    await on_startup_notify( dp )
 
 
-    from utils.notify_admins import on_startup_notify
-    await on_startup_notify(dp)
+    await set_default_commands( dp )
+    print( "бот запущен" )
 
-    from utils.set_botcommands import set_default_commands
-    await set_default_commands(dp)
-    print("бот запущен")
+    await test_connect_database()
+
+    print('Удаления таблиц')
+    await drop_tables()
+
+    print( "Создание таблиц" )
+    await create_tables()
+
+
+
 
 
 if __name__ == "__main__":
     from aiogram import executor
     from handlers import dp
 
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling( dp, on_startup=on_startup, skip_updates=True)

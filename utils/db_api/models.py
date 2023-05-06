@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, BigInteger, String, ForeignKey, Float, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -26,7 +26,7 @@ class User(Base):
         UniqueConstraint('photo'),
     )
 
-    def __repr__(self):
+    def __str__(self):
         return f"ID:{self.user_id}, Name:{self.name}"
 
 
@@ -39,6 +39,9 @@ class Wallet(Base):
     owner = relationship('User', back_populates='wallet')
 
     transactions = relationship('Transaction', back_populates='wallet')
+
+    def __str__(self):
+        return F"ID: {self.id}"
 
 
 class Transaction(Base):

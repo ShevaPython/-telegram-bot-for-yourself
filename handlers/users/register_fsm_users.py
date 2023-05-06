@@ -4,7 +4,7 @@ from states import UserRegister
 from keyboards.default import kb_menu
 from loader import dp, bot, types
 from utils.misc import rate_limit
-from utils.db_api import quick_commands as command
+from utils.db_api import commands_user as command
 
 
 @rate_limit(limit=10, key="/register")
