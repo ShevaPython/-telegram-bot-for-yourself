@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from loader import async_engine, async_session
+from .data_base import async_engine
 from .models import Base
 
 

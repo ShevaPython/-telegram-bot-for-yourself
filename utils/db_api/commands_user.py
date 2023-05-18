@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from loader import async_session
+from utils.db_api.data_base import async_session
 from utils.db_api.models import User
 
 

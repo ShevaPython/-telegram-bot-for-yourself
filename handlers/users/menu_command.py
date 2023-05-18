@@ -11,3 +11,4 @@ async def command_menu(message: types.Message):
     await bot.send_message(chat_id=message.from_user.id,
                            text="Добро пожаловать в Главное меню▶️",
                            reply_markup=kb_menu())
+
