@@ -3,6 +3,7 @@ from .help__command import dp
 from .menu_command import dp
 from .buttons import dp
 from .register_fsm_users import dp
+from .wallet_buttons import dp
 
 
 __all__ = ['dp']

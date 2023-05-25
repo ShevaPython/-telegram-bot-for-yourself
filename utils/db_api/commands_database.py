@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from .data_base import async_engine
+from .data_base import async_engine, async_session,get_async_session
 from .models import Base
 
 
@@ -17,7 +17,7 @@ async def drop_tables():
 
 async def test_connect_database():
     try:
-        async with async_session() as session:
+        async with get_async_session() as session:
             result = await session.execute(select(1))
             print( F" Подключения к базе даных результат : {result.scalar()}" )
     except Exception as e:

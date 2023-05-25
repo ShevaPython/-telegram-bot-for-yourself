@@ -6,12 +6,9 @@ def kb_menu() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [
             KeyboardButton(text='Мой аккаунт👤'),
-            KeyboardButton(text='Музыка🎧'),
             KeyboardButton(text="Кошелек👛"),
+            KeyboardButton(text='Музыка🎧'),
             KeyboardButton(text='Погода⛅️')
-        ],
-        [
-            KeyboardButton(text='Спрятать клавиатуру👀')
         ]
     ])
     return kb

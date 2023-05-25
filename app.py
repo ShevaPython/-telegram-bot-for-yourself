@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.utils import executor
 import filters
 import middlewares
@@ -20,12 +22,12 @@ async def on_startup(dp):
 
     await test_connect_database()
 
-    print( 'Удаления таблиц' )
-    await drop_tables()
+    # print( 'Удаления таблиц' )
+    # await drop_tables()
 
     print( "Создание таблиц" )
     await create_tables()
 
 
 if __name__ == "__main__":
-    executor.start_polling( dp, on_startup=on_startup, skip_updates=True )
+    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)

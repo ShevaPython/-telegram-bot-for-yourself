@@ -8,17 +8,17 @@ from keyboards.default import kb_wallet
 """Кнопки главного меню"""
 
 
-@dp.message_handler(Text(equals='Спрятать клавиатуру👀'))
-async def hide_kb_menu_button(message: types.Message):
-    """Убрать клавиатуру"""
-    await message.answer(text=F"Готово ✅ \n"
-                              F"Для повторного вызова клавиатуры введи->  Главное меню▶️",
-                         reply_markup=ReplyKeyboardRemove())
+# @dp.message_handler(Text(equals='Спрятать клавиатуру👀'))
+# async def hide_kb_menu_button(message: types.Message):
+#     """Убрать клавиатуру"""
+#     await message.answer(text=F"Готово ✅ \n"
+#                               F"Для повторного вызова клавиатуры введи->  Главное меню▶️",
+#                          reply_markup=ReplyKeyboardRemove())
 
 
 @dp.message_handler(Text(equals='Мой аккаунт👤'))
 async def joke_button(message: types.Message):
-    """Кнопка Анекдоты"""
+    """Кнопка Мой Акаунт"""
     await message.answer(text=F"Профиль пользователя")
 
 
