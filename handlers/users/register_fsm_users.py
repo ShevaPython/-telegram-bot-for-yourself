@@ -4,7 +4,7 @@ from states import UserRegister
 from keyboards.default import kb_menu
 from loader import dp, bot, types
 from utils.misc import rate_limit
-from utils.db_api.commands_user import UserCommand
+from utils.db_api.commands_all import UserCommand
 from utils.db_api.data_base import get_async_session
 
 
@@ -74,7 +74,7 @@ async def check_photo(message: types.Message):
     await message.reply(text=F"Это не фото,не обманывай!")
 
 
-@dp.message_handler(content_types=['photo'], state=UserRegister.photo)
+@dp.message_handler(content_types=types.ContentType.PHOTO, state=UserRegister.photo)
 async def load_photo(message: types.Message, state: FSMContext):
     """Сохранения фото в бд"""
     async with state.proxy() as data:
@@ -92,7 +92,11 @@ async def load_photo(message: types.Message, state: FSMContext):
     await  bot.send_message(chat_id=message.from_user.id,
                             text=F"Теперь в Вашем разделе присуцтвует кошелек!"
                                  F"На даный момент его баланс составляет 0.00")
-    user_cmd = UserCommand(async_session)
-    await user_cmd.create_user(user_id=message.from_user.id, state=state)
+    user_cmd = UserCommand(get_async_session())
+    await user_cmd.create_user(user_id=message.from_user.id,
+                               name=data['name'],
+                               age=data['age'],
+                               photo=data['photo'],
+                               status=data['status'])
     await state.finish()
 #

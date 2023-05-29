@@ -1,19 +1,23 @@
 import asyncio
-from models import Base
-from loader import async_engine
-from commands_user import delete_user,create_user,update_user,get_user
-from commands_database import init_database,test_connect_database
+from commands_all import UserCommand
+from utils.db_api.commands_database import test_connect_database, create_tables
+from data_base import get_async_session
 
 
 async def test_db():
     await test_connect_database()
-    await init_database()
-    await create_user(1,'Сергей',30,'dasdasd')
-    await create_user(2, 'Виктория', 28, 'фывфывфыв' )
-    await get_user(1)
-    await get_user(2)
+    await create_tables()
+    session =  get_async_session()
+    user_command = UserCommand(session)
+    # Создание пользователя
+    # await user_command.create_user(user_id=1, name='Victoria', age=20, photo='awd', status='register')
+    # await user_command.update_user(user_id=1,name='Виктория',photo='photo')
+    balance =await user_command.get_user_balance(1)
+    print(F'balance{balance}')
+    await session.commit()
+    await session.close()
+
 
 
 if __name__ == "__main__":
     asyncio.run(test_db())
-

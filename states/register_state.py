@@ -7,3 +7,7 @@ class UserRegister(StatesGroup):
     age = State()
     photo = State()
 
+class UpdateUserWallet(StatesGroup):
+    """Обновления кошелька пользователя"""
+    money = State()
+    month=State()

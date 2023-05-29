@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, BigInteger, String, ForeignKey, Float, Text, UniqueConstraint
+from sqlalchemy import Column, BigInteger, String, ForeignKey, Float, Text, UniqueConstraint,LargeBinary
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import datetime
@@ -15,12 +15,12 @@ class User(Base):
     user_id = Column(BigInteger, primary_key=True,nullable=False)
     name = Column(String(50),nullable=False)
     age = Column(BigInteger,nullable=False)
-    photo = Column(Text,nullable=False)
+    photo = Column(LargeBinary,nullable=False)
     status = Column(String(20), default='unregister')
     create_at = Column(sa.DateTime, server_default=func.now())
-    update_at = Column(sa.DateTime, server_default=func.now(), onupdate=datetime.datetime.now())
+    updated_at= Column(sa.DateTime, server_default=func.now(), onupdate=datetime.datetime.now())
 
-    wallet = relationship('Wallet', uselist=False, back_populates='owner')
+    wallet = relationship('Wallet', uselist=False, back_populates='owner',lazy="joined")
 
     __table_args__ = (
         UniqueConstraint('photo'),
@@ -36,9 +36,9 @@ class Wallet(Base):
     id = Column(BigInteger, primary_key=True,nullable=False)
     owner_id = Column(BigInteger, ForeignKey('users.user_id',ondelete='CASCADE'),nullable=False)
     balance = Column(Float, default=0)
-    owner = relationship('User', back_populates='wallet')
+    owner = relationship('User', back_populates='wallet',lazy='joined')
 
-    transactions = relationship('Transaction', back_populates='wallet')
+    transactions = relationship('Transaction', back_populates='wallet',lazy='selectin')
 
     def __str__(self):
         return F"ID: {self.id}"

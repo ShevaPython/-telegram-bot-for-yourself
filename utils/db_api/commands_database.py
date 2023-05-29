@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from .data_base import async_engine, async_session,get_async_session
+from .data_base import async_engine,get_async_session
 from .models import Base
 
 

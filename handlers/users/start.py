@@ -3,7 +3,7 @@ from loader import dp, bot
 from filters import IsPrivate
 from utils.db_api import  get_async_session
 from utils.misc import rate_limit
-from utils.db_api.commands_user import UserCommand
+from utils.db_api.commands_all import UserCommand
 from keyboards.default import kb_menu
 
 
