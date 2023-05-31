@@ -18,10 +18,14 @@ async def command_start(message: types.Message):
                 await bot.send_message(chat_id=message.from_user.id,
                                        text="<b>Добро пожаловать в Наш телеграм бот</b>👋!",
                                        reply_markup=kb_menu())
+                await bot.send_sticker(chat_id=message.from_user.id,
+                                       sticker='CAACAgIAAxkBAAEJKhJkdySeNm_qiIFfGqQqq0g2DP5g9QACoAADlp-MDmce7YYzVgABVS8E')
             else:
                 await bot.send_message(chat_id=message.from_user.id,
                                        text=F"Вы ,{message.from_user.full_name}, еще не зарегестрировались!🙁\n"
                                             F"Для работы с ботом пройди регестрацию здесь -> /register🖥")
+                await bot.send_sticker(chat_id=message.from_user.id,
+                                       sticker='CAACAgIAAxkBAAEJKiVkdyaoE6h1eFhnT_j3GUurql_P1AACoQADlp-MDtkXv77xL61nLwQ')
 
     except Exception as e:
         print(f"Ошибка при выборке пользователя: {e}")

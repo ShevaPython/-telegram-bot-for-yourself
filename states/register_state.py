@@ -11,3 +11,10 @@ class UpdateUserWallet(StatesGroup):
     """Обновления кошелька пользователя"""
     money = State()
     month=State()
+
+
+class UpdateUserData(StatesGroup):
+    """Обновления данных пользователя"""
+    name = State()
+    age = State()
+    photo = State()

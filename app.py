@@ -21,7 +21,7 @@ async def on_startup(dp):
     print( "бот запущен" )
 
     await test_connect_database()
-
+    #
     # print( 'Удаления таблиц' )
     # await drop_tables()
 

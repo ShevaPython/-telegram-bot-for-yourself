@@ -131,3 +131,5 @@ dmypy.json
 .vscode/
 data/config.py
 data
+/photos
+photos

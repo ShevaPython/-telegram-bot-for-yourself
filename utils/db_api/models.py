@@ -15,7 +15,7 @@ class User(Base):
     user_id = Column(BigInteger, primary_key=True,nullable=False)
     name = Column(String(50),nullable=False)
     age = Column(BigInteger,nullable=False)
-    photo = Column(LargeBinary,nullable=False)
+    photo = Column(Text, nullable=False)
     status = Column(String(20), default='unregister')
     create_at = Column(sa.DateTime, server_default=func.now())
     updated_at= Column(sa.DateTime, server_default=func.now(), onupdate=datetime.datetime.now())

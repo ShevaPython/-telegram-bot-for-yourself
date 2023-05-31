@@ -8,9 +8,46 @@ from loader import dp, bot, types
 from states.register_state import UpdateUserWallet
 from utils.db_api import get_async_session
 from utils.db_api.commands_all import UserCommand, WalletCommands, TransactionCommands
-from keyboards.default import kb_wallet
+from keyboards.default import kb_wallet, kb_menu, kb_stop_fsm
 
 logger = logging.getLogger(__name__)
+
+
+@dp.message_handler(Text(equals="Отмена операции🙅‍♂️"), state='*')
+async def cancel_handler_fsm_wallet(message: types.Message, state: FSMContext):
+    try:
+        async with get_async_session() as session:
+            user_cmd = UserCommand(session)
+            user = await user_cmd.get_user(message.from_user.id)
+            if user:
+                current_state = await state.get_state()
+                if current_state is None:
+                    return
+                # Очистка состояния машины
+                await state.finish()
+
+                # Отправка сообщения с главным меню и клавиатурой
+                await bot.send_message(chat_id=message.from_user.id,
+                                       text="Вы вернулись в главное меню, все предыдущие действия отменены.",
+                                       reply_markup=kb_menu())
+            else:
+                await bot.send_message(chat_id=message.from_user.id,
+                                       text=F"Пройдите регестрацию.")
+    except Exception as e:
+        print(F'Ошибка {e}')
+
+
+@dp.message_handler(Text(equals='Кошелек👛'))
+async def wallet_button(message: types.Message):
+    """Кнопка кошелек"""
+    await message.answer(text=F"Добро пожаловать,я твой личный кошелек 🙋‍♂️",
+                         reply_markup=kb_wallet()
+                         )
+    await bot.delete_message(chat_id=message.from_user.id,
+                             message_id=message.message_id)
+
+    await  bot.send_sticker(chat_id=message.from_user.id,
+                            sticker='CAACAgIAAxkBAAEJKhBkdyRg9GWqhKWwBj10DHvG8n2vIwACAwEAAladvQoC5dF4h-X6Ty8E')
 
 
 @dp.message_handler(Text(equals='Баланс💰'))
@@ -30,6 +67,8 @@ async def show_balance(message: types.Message):
                 await bot.send_message(chat_id=message.from_user.id,
                                        text=f"Баланс пользователя: {balance} грн 💵.",
                                        reply_markup=kb_wallet())
+                await bot.send_sticker(chat_id=message.from_user.id,
+                                       sticker='CAACAgEAAxkBAAEJKkFkdyhkodvPWub9FZApYknH1JXwvwACHQEAAjgOghHhhIkhaufuiS8E')
 
                 # Удаляем сообщение "Баланс💰"
                 await bot.delete_message(chat_id=message.from_user.id,
@@ -42,9 +81,9 @@ async def show_balance(message: types.Message):
                                text="Произошла ошибка при выполнении запроса. Пожалуйста, попробуйте позже.")
 
 
-@dp.message_handler(Text(equals='Пополнить баланс💵'))
-async def show_balance(message: types.Message):
-    '''Показать баланс пользователя'''
+@dp.message_handler(Text(equals='Пополнить баланс💵'), state=None)
+async def update_balance_state(message: types.Message):
+    '''Обновить баланс'''
     try:
         async with get_async_session() as session:
             user_command = UserCommand(session)
@@ -52,13 +91,12 @@ async def show_balance(message: types.Message):
 
             if user is None:
                 await bot.send_message(chat_id=message.from_user.id,
-                                       text="Вы не зарегистрированы. Пожалуйста, пройдите регистрацию.",
-                                       reply_markup=kb_wallet())
+                                       text="Вы не зарегистрированы. Пожалуйста, пройдите регистрацию.")
             else:
                 await UpdateUserWallet.money.set()
                 await bot.send_message(chat_id=message.from_user.id,
                                        text="Введите сумму пополнения баланса:",
-                                       reply_markup=kb_wallet())
+                                       reply_markup=kb_stop_fsm())
             await bot.delete_message(chat_id=message.from_user.id,
                                      message_id=message.message_id)
 
@@ -70,13 +108,13 @@ async def show_balance(message: types.Message):
                                text="Произошла ошибка при выполнении запроса. Пожалуйста, попробуйте позже.")
 
 
-@dp.message_handler(lambda message: not message.text.isdigit() or int(message.text)<=0,
+@dp.message_handler(lambda message: not message.text.isdigit() or int(message.text) <= 0,
                     state=UpdateUserWallet.money)
 async def check_update_money(message: types.Message):
     """Проверка на валидность ввода"""
-    await message.reply(text=F"Сума пополнения должна быть числом \n"
-                             F"И не должна быть меньше 0",
-                        reply_markup=kb_wallet())
+    return await message.reply(text=F"Сума пополнения должна быть числом \n"
+                                    F"И не должна быть меньше 0",
+                               reply_markup=kb_stop_fsm())
 
 
 @dp.message_handler(state=UpdateUserWallet.money)
@@ -93,13 +131,11 @@ async def load_chain_money(message: types.Message, state: FSMContext):
                                                                      amount=change_balance)
             wallet_id = await wallet.get_wallet(owner_id=message.from_user.id)
             # Create a transaction
-            transaction=await wallet.create_transaction(wallet_id=wallet_id.id, amount=change_balance)
-
+            transaction = await wallet.create_transaction(wallet_id=wallet_id.id, amount=change_balance)
 
             await bot.send_message(chat_id=message.from_user.id,
-                                    text=F"Вашь баланс изменен на {change_balance} грн.✅\n"
-                                         F"Cостовляет  грн {user_change_balance}💵"
-                                         F"Транзакция {transaction.amount}",
+                                   text=F"Вашь баланс изменен на {change_balance} грн.✅\n"
+                                        F"Cостовляет  грн {user_change_balance}💵",
                                    reply_markup=kb_wallet())
             await session.commit()
             await state.finish()
@@ -107,7 +143,6 @@ async def load_chain_money(message: types.Message, state: FSMContext):
         logger.exception("Ошибка при пополнении баланса")
         await bot.send_message(chat_id=message.from_user.id,
                                text="Произошла ошибка при пополнении баланса. Пожалуйста, попробуйте позже.")
-
 
 
 @dp.message_handler(Text(equals='Баланс за определеный месяц 🌙'))
