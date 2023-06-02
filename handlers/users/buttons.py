@@ -10,7 +10,3 @@ async def music_button(message: types.Message):
     await message.answer(text=F"Слушаем музыку")
 
 
-@dp.message_handler(Text(equals='Погода⛅️'))
-async def weather_button(message: types.Message):
-    """Кнопка погоды"""
-    await message.answer(text=F"Прогноз погоды")

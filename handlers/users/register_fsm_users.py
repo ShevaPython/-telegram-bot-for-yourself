@@ -3,7 +3,7 @@ import aiofiles
 import os
 from aiogram.dispatcher.filters import Command
 from states import UserRegister
-from keyboards.default import kb_menu
+from keyboards.default import kb_menu,kb_stop_fsm_register
 from loader import dp, bot, types
 from utils.misc import rate_limit
 from utils.db_api.commands_all import UserCommand
@@ -24,7 +24,8 @@ async def register(message: types.Message, state: FSMContext):
                                        sticker='CAACAgIAAxkBAAEJKhZkdyUeLsuissI6iQ9HOIZArcWOCgACHAADlp-MDpnUab5i8nnlLwQ')
                 await bot.send_message(chat_id=message.from_user.id,
                                        text=F"Регестрация началась🚦 \n"
-                                            F"Введите свое имя :")
+                                            F"Введите свое имя :",
+                                       reply_markup=kb_stop_fsm_register())
                 await UserRegister.name.set()
             elif user.status == 'register':
                 await bot.send_message(chat_id=message.from_user.id,
@@ -42,7 +43,7 @@ async def register(message: types.Message, state: FSMContext):
                     state=UserRegister.name)
 async def check_name(message: types.Message):
     """Проверка на коректность ввода имени"""
-    await message.reply(text=F"Имя должно состоять только из букв!")
+    await message.reply(text=F"Имя должно состоять только из букв!",reply_markup=kb_stop_fsm_register())
 
 
 @dp.message_handler(state=UserRegister.name)
@@ -51,7 +52,8 @@ async def load_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
     await bot.send_message(chat_id=message.from_user.id,
-                           text=F'Сколько тебе лет {data["name"]}??')
+                           text=F'Сколько тебе лет {data["name"]}??',
+                           reply_markup=kb_stop_fsm_register())
 
     await UserRegister.next()
 
@@ -60,7 +62,8 @@ async def load_name(message: types.Message, state: FSMContext):
                     state=UserRegister.age)
 async def check_age(message: types.Message):
     """Проверка на коректность ввода возраста"""
-    await message.reply(text=F"Возраст должен состоять только из цыфр!И быть реальным")
+    await message.reply(text=F"Возраст должен состоять только из цыфр!И быть реальным",
+                        reply_markup=kb_stop_fsm_register())
 
 
 @dp.message_handler(state=UserRegister.age)
@@ -69,15 +72,17 @@ async def load_age(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["age"] = int(message.text)
     await bot.send_message(chat_id=message.from_user.id,
-                           text=F'Отправь мне свою фотографию -> 📷')
+                           text=F'Отправь мне свою фотографию -> 📷',
+                           reply_markup=kb_stop_fsm_register())
 
     await UserRegister.next()
 
 
-@dp.message_handler(lambda message: not message.photo, state=UserRegister.photo)
+@dp.message_handler(lambda message: not message.photo,content_types=['photo'],state=UserRegister.photo)
 async def check_photo(message: types.Message):
     """Проверка на фотографию"""
-    await message.reply(text=F"Это не фото,не обманывай!")
+    await message.reply(text=F"Это не фото,не обманывай!",
+                        reply_markup=kb_stop_fsm_register())
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO, state=UserRegister.photo)

@@ -5,15 +5,13 @@ from aiogram.dispatcher import FSMContext
 
 from loader import dp
 from aiogram.dispatcher.filters import Text
-from keyboards.default import kb_account
+from keyboards.default import kb_account, kb_stop_fsm_all
 from loader import types, bot
 from utils.db_api.commands_all import UserCommand
 from utils.db_api.data_base import get_async_session
 from states import UpdateUserData
 
 
-# Мои данные💻
-# Изменить возраст🫀
 @dp.message_handler(Text(equals='Мой аккаунт👤'))
 async def account_button(message: types.Message):
     """Кнопка Мой Акаунт"""
@@ -22,12 +20,15 @@ async def account_button(message: types.Message):
             user_cmd = UserCommand(session)
             user = await user_cmd.get_user(message.from_user.id)
             if user:
-                await bot.send_message(chat_id=message.from_user.id,
-                                       text=F"Привет,ты в своем личном кабинете 🙋‍♂️",
-                                       reply_markup=kb_account())
+                await bot.send_photo(chat_id=message.from_user.id,
+                                     photo='https://img.freepik.com/free-photo/workplace-late-at-night-night-work-concept'
+                                           '_169016-17457.jpg?w=1380&t=st=1685721183~exp=1685721783~hmac=0ee03b9cb06f3564'
+                                           'fb568947e856943410f11f142933e7a1c954bcb5a38cd110',
+                                     caption=F"Привет,ты в своем личном кабинете 🙋‍♂️ \n"
+                                             F"Здесь ты можешь изменить свои данные📂",
+                                     reply_markup=kb_account())
                 await bot.delete_message(chat_id=message.from_user.id, message_id=message.message_id)
-                await bot.send_sticker(chat_id=message.from_user.id,
-                                       sticker='CAACAgIAAxkBAAEHh7Fj2Sf4gLEBGA7xgulqRXnzsCXGPwACCwMAAm2wQgN_tBzazKZEJS0E')
+
             else:
                 await bot.send_message("Пройдите регестрацию.")
     except Exception as e:
@@ -72,7 +73,8 @@ async def change_age(message: types.Message):
             user = await user_cmd.get_user(message.from_user.id)
             if user:
                 await bot.send_message(chat_id=message.from_user.id,
-                                       text='Ведите возраст : ')
+                                       text='Ведите возраст : ',
+                                       reply_markup=kb_stop_fsm_all())
                 await UpdateUserData.age.set()
             else:
                 await bot.send_message(chat_id=message.from_user.id, text="Пройдите регестрацию.")
@@ -86,7 +88,8 @@ async def change_age(message: types.Message):
                     state=UpdateUserData.age)
 async def check_update_age(message: types.Message):
     """Проверка на коректность ввода возраста"""
-    await message.reply(text=F"Возраст должен состоять только из цыфр!И быть реальным")
+    return await message.reply(text=F"Возраст должен состоять только из цыфр!И быть реальным",
+                               reply_markup=kb_stop_fsm_all())
 
 
 @dp.message_handler(state=UpdateUserData.age)
@@ -123,7 +126,8 @@ async def change_name(message: types.Message):
             user = await user_cmd.get_user(message.from_user.id)
             if user:
                 await bot.send_message(chat_id=message.from_user.id,
-                                       text='Ведите имя : ')
+                                       text='Ведите имя : ',
+                                       reply_markup=kb_stop_fsm_all())
                 await UpdateUserData.name.set()
             else:
                 await bot.send_message(chat_id=message.from_user.id, text="Пройдите регестрацию.")
@@ -137,7 +141,8 @@ async def change_name(message: types.Message):
                     state=UpdateUserData.name)
 async def check_update_name(message: types.Message):
     """Проверка на коректность ввода имени"""
-    await message.reply(text=F"Имя должно состоять только из букв!")
+    return await message.reply(text=F"Имя должно состоять только из букв!",
+                               reply_markup=kb_stop_fsm_all())
 
 
 @dp.message_handler(state=UpdateUserData.name)
@@ -174,7 +179,8 @@ async def change_update_photo(message: types.Message):
             user = await user_cmd.get_user(message.from_user.id)
             if user:
                 await bot.send_message(chat_id=message.from_user.id,
-                                       text='Отправте фотографию для изменения фото : ➡️➡️➡️ ')
+                                       text='Отправте фотографию для изменения фото : ➡️➡️➡️ ',
+                                       reply_markup=kb_stop_fsm_all())
                 await UpdateUserData.photo.set()
             else:
                 await bot.send_message(chat_id=message.from_user.id, text="Пройдите регестрацию.")
@@ -187,7 +193,8 @@ async def change_update_photo(message: types.Message):
 @dp.message_handler(lambda message: not message.photo, state=UpdateUserData.photo)
 async def check_photo(message: types.Message):
     """Проверка на фотографию"""
-    await message.reply(text=F"Это не фото,не обманывай!🙁")
+    return await message.reply(text=F"Это не фото,не обманывай!🙁",
+                               reply_markup=kb_stop_fsm_all())
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO, state=UpdateUserData.photo)

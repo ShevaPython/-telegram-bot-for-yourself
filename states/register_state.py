@@ -7,10 +7,23 @@ class UserRegister(StatesGroup):
     age = State()
     photo = State()
 
+
 class UpdateUserWallet(StatesGroup):
     """Обновления кошелька пользователя"""
     money = State()
-    month=State()
+    month = State()
+    chenge_balanc = State()
+    take_money = State()
+
+
+class WeatherStateOneday(StatesGroup):
+    """Состояния установки города"""
+    city = State()
+
+
+class WeatherStatWeek(StatesGroup):
+    """Состояния установки города"""
+    city = State()
 
 
 class UpdateUserData(StatesGroup):

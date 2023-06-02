@@ -105,7 +105,7 @@ class WalletCommands:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def update_wallet_balance(self, owner_id: int, amount: float) -> float:
+    async def add_money_balance(self, owner_id: int, amount: float) -> float:
         try:
             wallet = await self.session.execute(select(Wallet).filter(Wallet.owner_id == owner_id))
             row = wallet.scalar_one_or_none()
@@ -122,6 +122,22 @@ class WalletCommands:
             await self.session.rollback()
             raise
 
+    async def take_off_balance(self, owner_id: int, amount: float) -> float:
+        try:
+            wallet = await self.session.execute(select(Wallet).filter(Wallet.owner_id == owner_id))
+            row = wallet.scalar_one_or_none()
+
+            if row:
+                row.balance -= amount  # Subtract the amount from the balance
+                await self.session.commit()
+                return row.balance
+
+            return 0
+
+        except SQLAlchemyError as e:
+            print(f"Ошибка при обновлении баланса кошелька: {e}")
+            await self.session.rollback()
+
     async def create_transaction(self, wallet_id: int, amount: float) -> Transaction:
         try:
             transaction = Transaction(wallet_id=wallet_id, amount=amount)
@@ -133,13 +149,19 @@ class WalletCommands:
             await self.session.rollback()
             raise
 
-    async def get_wallet(self, owner_id: int) -> Wallet:
+    async def get_wallet_from_user(self, owner_id: int) -> Wallet:
         try:
             result = await self.session.execute(select(Wallet).filter(Wallet.owner_id == owner_id))
             row = result.fetchone()
             return row[0] if row else None
         except SQLAlchemyError as e:
             print(f"Ошибка при получении кошелька: {e}")
+
+    async def get_wallet(self, wallet_id: int) -> float:
+        wallet = await self.session.get(Wallet, wallet_id)
+        if wallet is not None:
+            return wallet.balance
+        return 0
 
 
 class TransactionCommands:
@@ -170,6 +192,3 @@ class TransactionCommands:
         except SQLAlchemyError as e:
             print(f"Ошибка при получении транзакций за месяц: {e}")
             raise
-
-
-__all__ = ['UserCommand', 'WalletCommands']

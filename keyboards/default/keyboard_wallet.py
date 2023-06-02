@@ -7,6 +7,7 @@ def kb_wallet() -> ReplyKeyboardMarkup:
         [
             KeyboardButton(text='Баланс💰'),
             KeyboardButton(text='Пополнить баланс💵'),
+            KeyboardButton(text='Взять с колшелька💵')
 
         ],
         [

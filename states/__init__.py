@@ -1,1 +1,1 @@
-from .register_state import UserRegister,UpdateUserData,UpdateUserWallet
+from .register_state import UserRegister,UpdateUserWallet,WeatherStateOneday,UpdateUserData,WeatherStatWeek
